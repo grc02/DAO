@@ -1,9 +1,12 @@
 const { ethers } = require("hardhat");
 
 async function main() {
+  // Initial setup of the variables
   const [deployer, executor, proposer, voter1, voter2, voter3, voter4, voter5] =
     await ethers.getSigners();
   const amount = ethers.utils.parseEther("50");
+
+  // Token contract deployment
 
   const Token = await ethers.getContractFactory("GovernanceTokenDAO");
   const token = await Token.deploy();
@@ -19,6 +22,26 @@ async function main() {
 
   console.log(ethers.utils.formatEther(balanceVoter1));
   console.log(ethers.utils.formatEther(balanceVoter4));
+
+  // Timelock deployment
+
+  const minDelay = 1;
+
+  const GovernanceTimeLock = await ethers.getContractFactory(
+    "GovernanceTimeLock"
+  );
+  const timeLock = await GovernanceTimeLock.deploy(
+    minDelay,
+    [proposer.address],
+    [executor.address]
+  );
+
+  await timeLock.deployed();
+
+  const _minDelay = await timeLock.getMinDelay();
+  console.log(parseInt(_minDelay));
+
+  // Treasury contract deployment
 
   const Treasury = await ethers.getContractFactory("Treasury");
   const treasury = await Treasury.deploy(deployer.address, { value: amount });
