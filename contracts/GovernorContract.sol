@@ -31,7 +31,7 @@ contract GovernorContract is
         override
         returns (uint256)
     {
-        return 0e18;
+        return 3e18;
     }
 
     // The following functions are overrides required by Solidity.
