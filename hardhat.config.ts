@@ -27,6 +27,9 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0
     },
+    receiver: {
+      default: 1
+    }
   },
 };
 export default config;
