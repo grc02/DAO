@@ -1,5 +1,7 @@
-import { ethers } from "hardhat";
-import { FUNC_SIGNATURE, RECEIVER_OF_FUNDS } from "../helper-hardhat-config";
+import { ethers, network } from "hardhat";
+import { FUNC_SIGNATURE, RECEIVER_OF_FUNDS, developmentChains, VOTING_DELAY, proposalFile } from "../helper-hardhat-config";
+import { moveBlocks } from "../utils/moveBlocks";
+import * as fs from "fs";
 
 export async function propose(args: any[], functionToCall: string, proposalDescription: string) {
    const governor = await ethers.getContract("GovernorContract");
@@ -13,6 +15,17 @@ export async function propose(args: any[], functionToCall: string, proposalDescr
       [encodeFunctionCall],
       proposalDescription
     );
+
+   if (developmentChains.includes(network.name)) {
+      await moveBlocks(VOTING_DELAY + 1);
+   };
+   const proposeReceipt = await proposeTx.wait(1);
+   const proposalId = proposeReceipt.events[0].args.proposalId;
+   console.log(`Proposed with proposal ID: ${proposalId}`);
+
+   let proposals = JSON.parse(fs.readFileSync(`./${proposalFile}`, "utf-8"));
+   proposals[network.config.chainId!.toString()].push(proposalId.toString());
+   fs.writeFileSync(`./${proposalFile}`, JSON.stringify(proposals));
 }
 
 propose([], FUNC_SIGNATURE, `Send funds to this address: ${RECEIVER_OF_FUNDS}`)
@@ -20,4 +33,4 @@ propose([], FUNC_SIGNATURE, `Send funds to this address: ${RECEIVER_OF_FUNDS}`)
   .catch((error) => {
     console.error(error)
     process.exit(1)
-  })
+  });
