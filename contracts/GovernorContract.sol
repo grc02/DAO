@@ -2,16 +2,18 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/governance/Governor.sol";
-import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
+import "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 
 contract GovernorContract is
     Governor,
     GovernorSettings,
     GovernorCountingSimple,
     GovernorVotes,
+    GovernorVotesQuorumFraction,
     GovernorTimelockControl
 {
     constructor(
@@ -21,22 +23,16 @@ contract GovernorContract is
         uint256 _votingPeriod,
         uint256 _votingDelay
     )
-        Governor("MyGovernor")
-        GovernorSettings(_quorumPercentage, _votingPeriod, _votingDelay)
+        Governor("GovernorContract")
+        GovernorSettings(
+            _votingDelay, /* 1 block */ // votind delay
+            _votingPeriod, // 45818, /* 1 week */ // voting period
+            0 // proposal threshold
+        )
         GovernorVotes(_token)
+        GovernorVotesQuorumFraction(_quorumPercentage)
         GovernorTimelockControl(_timelock)
     {}
-
-    function quorum(uint256 blockNumber)
-        public
-        pure
-        override
-        returns (uint256)
-    {
-        return 3e18;
-    }
-
-    // The following functions are overrides required by Solidity.
 
     function votingDelay()
         public
@@ -54,6 +50,26 @@ contract GovernorContract is
         returns (uint256)
     {
         return super.votingPeriod();
+    }
+
+    // The following functions are overrides required by Solidity.
+
+    function quorum(uint256 blockNumber)
+        public
+        view
+        override(IGovernor, GovernorVotesQuorumFraction)
+        returns (uint256)
+    {
+        return super.quorum(blockNumber);
+    }
+
+    function getVotes(address account, uint256 blockNumber)
+        public
+        view
+        override(IGovernor, Governor)
+        returns (uint256)
+    {
+        return super.getVotes(account, blockNumber);
     }
 
     function state(uint256 proposalId)
