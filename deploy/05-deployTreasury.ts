@@ -1,6 +1,7 @@
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { ethers } from "hardhat";
+import { VALUE } from "../helper-hardhat-config"
 
 const deployTreasury: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   // @ts-ignore
@@ -13,6 +14,7 @@ const deployTreasury: DeployFunction = async function (hre: HardhatRuntimeEnviro
     from: deployer,
     args: [receiver],
     log: false,
+    value: VALUE
   });
 
   log(`Deployer's address = ${deployer}`);
