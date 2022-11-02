@@ -22,7 +22,8 @@ How you can deploy & run scripts:
 1. Setup local blockchain
 2. Propose a new value to be added to our Box contract
 3. Vote on that proposal
-4. Queue & Execute proposal!
+4. Queue the proposal!
+5. Finally, execute it!
 
 ## Requirements
 
@@ -48,7 +49,7 @@ cd DAO
 2. Install dependencies
 
 ```sh
-yarn install
+yarn
 ```
 
 or
