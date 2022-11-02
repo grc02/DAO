@@ -70,5 +70,5 @@ yarn hardhat node
 yarn hardhat run scripts/propose.ts --network localhost
 yarn hardhat run scripts/vote.ts --network localhost
 yarn hardhat run scripts/queue.ts --network localhost
-yarn hardhat run scripts/queue.ts --network localhost
+yarn hardhat run scripts/execute.ts --network localhost
 ```
