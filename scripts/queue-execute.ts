@@ -8,7 +8,7 @@ import {
 import { moveBlocks } from "../utils/moveBlocks";
 import { moveTime } from "../utils/moveTime";
 
-export async function queueAndExecute() {
+export async function queue() {
   const functionToCall = FUNC_SIGNATURE;
   const treasury = await ethers.getContract("Treasury");
   const encodedFunctionCall = treasury.interface.encodeFunctionData(functionToCall);
@@ -23,20 +23,9 @@ export async function queueAndExecute() {
     await moveTime(MIN_DELAY + 1);
     await moveBlocks(1);
   }
-
-  console.log("Executing...")
-  const executeTx = await governor.execute(
-    [treasury.address],
-    [0],
-    [encodedFunctionCall],
-    descriptionHash
-  );
-  await executeTx.wait(1);
-  console.log(`Treasury is executed: ${await treasury.isReleased()}`);
-  console.log(`Treasury has transfered this amount of funds: ${await treasury.totalFunds()}`);
 }
 
-queueAndExecute()
+queue()
   .then(() => process.exit(0))
   .catch((error) => {
     console.error(error)
